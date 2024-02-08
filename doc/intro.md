@@ -1,0 +1,3 @@
+# Introduction to aggdemo
+
+TODO: write [great documentation](http://jacobian.org/writing/what-to-write/)
