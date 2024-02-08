@@ -2,6 +2,7 @@
   (:require [tablecloth.api :as tc]
             [tech.v3.dataset :as ds]
             [tech.v3.datatype.functional :as fun]
+            [tech.v3.dataset.reductions :as reds]
             [criterium.core :as c]))
 
 (def clean (tc/dataset "clean.tsv" {:separator "\t" :key-fn keyword}))
@@ -47,6 +48,14 @@
         (apply vector)
         ds/->dataset))
 
+
+(defn reducing-agg [df]
+  (let [cnames (->> df keys (filter #(numerical? (df %))))
+        fields  (->> cnames (map (fn [k] [k (reds/mean k)])) (into {}))]
+    (reds/group-by-column-agg
+     [:field-1 :field-19 :field-2]
+     fields
+     df)))
 #_
 (c/quick-bench (agg clean))
 
@@ -67,7 +76,7 @@
 
 ;; Evaluation count : 6 in 6 samples of 1 calls.
 ;; Execution time mean : 445.641532 ms
-;; Execution time std-deviation : 9.023157 ms
+;; Execution time std-deviation : 9.023157 mss
 ;; Execution time lower quantile : 435.675399 ms ( 2.5%)
 ;; Execution time upper quantile : 458.108112 ms (97.5%)
 ;; Overhead used : 1.858909 ns
@@ -87,6 +96,16 @@
 ;; low-mild	 1 (16.6667 %)
 ;; Variance from outliers : 13.8889 % Variance is moderately inflated by outliers
 
+
+#_
+(c/quick-bench (reducing-agg clean))
+
+;; Evaluation count : 30 in 6 samples of 5 calls.
+;; Execution time mean : 27.356328 ms
+;; Execution time std-deviation : 2.659641 ms
+;; Execution time lower quantile : 25.054558 ms ( 2.5%)
+;; Execution time upper quantile : 30.521558 ms (97.5%)
+;; Overhead used : 1.891062 ns
 
 ;;helper for verification.
 (defn sort-by-group [ds]
