@@ -26,7 +26,7 @@
                (reduce-kv (fn [acc cname col]
                             (if (numerical? col)
                               (assoc acc cname (fun/mean col))
-                              acc)) {:$group-key [k]})))
+                              acc)) {:$group-name {:field-1 (k 0) :field-19 (k 1) :field-2 (k 2)}})))
         (apply vector)
         ds/->dataset))
 
@@ -43,7 +43,7 @@
                (reduce-kv (fn [acc cname col]
                             (if (numerical? col)
                               (assoc acc cname (naive-mean col))
-                              acc)) {:$group-key [k]})))
+                              acc)) {:$group-name {:field-1 (k 0) :field-19 (k 1) :field-2 (k 2)}})))
         (apply vector)
         ds/->dataset))
 
@@ -66,19 +66,28 @@
 (c/quick-bench (faster-agg clean))
 
 ;; Evaluation count : 6 in 6 samples of 1 calls.
-;; Execution time mean : 410.350732 ms
-;; Execution time std-deviation : 7.332131 ms
-;; Execution time lower quantile : 402.336599 ms ( 2.5%)
-;; Execution time upper quantile : 420.504524 ms (97.5%)
+;; Execution time mean : 445.641532 ms
+;; Execution time std-deviation : 9.023157 ms
+;; Execution time lower quantile : 435.675399 ms ( 2.5%)
+;; Execution time upper quantile : 458.108112 ms (97.5%)
 ;; Overhead used : 1.858909 ns
 
 #_
 (c/quick-bench (fastest-agg clean))
 
 ;; Evaluation count : 6 in 6 samples of 1 calls.
-;; Execution time mean : 288.989482 ms
-;; Execution time std-deviation : 19.631281 ms
-;; Execution time lower quantile : 271.648599 ms ( 2.5%)
-;; Execution time upper quantile : 319.472599 ms (97.5%)
+;; Execution time mean : 276.388349 ms
+;; Execution time std-deviation : 3.778802 ms
+;; Execution time lower quantile : 272.463799 ms ( 2.5%)
+;; Execution time upper quantile : 282.667499 ms (97.5%)
 ;; Overhead used : 1.858909 ns
 
+;; Found 2 outliers in 6 samples (33.3333 %)
+;; low-severe	 1 (16.6667 %)
+;; low-mild	 1 (16.6667 %)
+;; Variance from outliers : 13.8889 % Variance is moderately inflated by outliers
+
+
+;;helper for verification.
+(defn sort-by-group [ds]
+  (ds/sort-by-column ds :$group-name (fn [l r] (compare (vec l) (vec r)))))
