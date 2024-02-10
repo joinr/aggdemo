@@ -1,5 +1,6 @@
 (ns aggdemo.core
-  (:require [tablecloth.api :as tc]
+  (:require [aggdemo.patch]
+            [tablecloth.api :as tc]
             [tech.v3.dataset :as ds]
             [tech.v3.datatype.functional :as fun]
             [tech.v3.dataset.reductions :as reds]
